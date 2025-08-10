@@ -87,7 +87,7 @@ class Project:
     def _is_ignored_dirname(self, dirname: str) -> bool:
         return dirname.startswith(".")
 
-    def _is_ignored_relative_path(self, relative_path: str, ignore_non_source_files: bool = True) -> bool:
+    def _is_ignored_relative_path(self, relative_path: str | Path, ignore_non_source_files: bool = True) -> bool:
         """
         Determine whether a path should be ignored based on file type and ignore patterns.
 
@@ -111,6 +111,10 @@ class Project:
         # Create normalized path for consistent handling
         rel_path = Path(relative_path)
 
+        # always ignore paths inside .git
+        if len(rel_path.parts) > 0 and rel_path.parts[0] == ".git":
+            return True
+
         # Check each part of the path against always fulfilled ignore conditions
         dir_parts = rel_path.parts
         if is_file:
@@ -121,13 +125,15 @@ class Project:
             if self._is_ignored_dirname(part):
                 return True
 
-        return match_path(relative_path, self.get_ignore_spec(), root_path=self.project_root)
+        return match_path(str(relative_path), self.get_ignore_spec(), root_path=self.project_root)
 
-    def is_ignored_path(self, path: str | Path) -> bool:
+    def is_ignored_path(self, path: str | Path, ignore_non_source_files: bool = False) -> bool:
         """
         Checks whether the given path is ignored
 
         :param path: the path to check, can be absolute or relative
+        :param ignore_non_source_files: whether to ignore files that are not source files
+            (according to the file masks determined by the project's programming language)
         """
         path = Path(path)
         if path.is_absolute():
@@ -135,11 +141,7 @@ class Project:
         else:
             relative_path = path
 
-        # always ignore paths inside .git
-        if len(relative_path.parts) > 0 and relative_path.parts[0] == ".git":
-            return True
-
-        return match_path(str(relative_path), self.get_ignore_spec(), root_path=self.project_root)
+        return self._is_ignored_relative_path(str(relative_path), ignore_non_source_files=ignore_non_source_files)
 
     def is_path_in_project(self, path: str | Path) -> bool:
         """

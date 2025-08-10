@@ -37,8 +37,11 @@ class TestGitignoreParser:
         │   ├── .gitignore
         │   ├── main.py
         │   ├── test.log
-        │   └── build/
-        │       └── output.o
+        │   ├── build/
+        │   │   └── output.o
+        │   └── lib/
+        │       ├── .gitignore
+        │       └── cache.tmp
         └── docs/
             ├── .gitignore
             ├── api.md
@@ -48,6 +51,7 @@ class TestGitignoreParser:
         # Create directories
         (self.repo_path / "src").mkdir()
         (self.repo_path / "src" / "build").mkdir()
+        (self.repo_path / "src" / "lib").mkdir()
         (self.repo_path / "docs").mkdir()
         (self.repo_path / "docs" / "temp").mkdir()
 
@@ -57,6 +61,7 @@ class TestGitignoreParser:
         (self.repo_path / "src" / "main.py").touch()
         (self.repo_path / "src" / "test.log").touch()
         (self.repo_path / "src" / "build" / "output.o").touch()
+        (self.repo_path / "src" / "lib" / "cache.tmp").touch()
         (self.repo_path / "docs" / "api.md").touch()
         (self.repo_path / "docs" / "temp" / "draft.md").touch()
 
@@ -79,6 +84,15 @@ build/
 """
         )
 
+        # Create src/lib/.gitignore (deeply nested)
+        src_lib_gitignore = self.repo_path / "src" / "lib" / ".gitignore"
+        src_lib_gitignore.write_text(
+            """# Library gitignore
+*.tmp
+*.cache
+"""
+        )
+
         # Create docs/.gitignore
         docs_gitignore = self.repo_path / "docs" / ".gitignore"
         docs_gitignore.write_text(
@@ -93,10 +107,10 @@ temp/
         parser = GitignoreParser(str(self.repo_path))
 
         assert parser.repo_root == str(self.repo_path.absolute())
-        assert len(parser.get_ignore_specs()) == 3
+        assert len(parser.get_ignore_specs()) == 4
 
     def test_find_gitignore_files(self):
-        """Test finding all gitignore files in repository."""
+        """Test finding all gitignore files in repository, including deeply nested ones."""
         parser = GitignoreParser(str(self.repo_path))
 
         # Get file paths from specs
@@ -106,9 +120,10 @@ temp/
         rel_paths = [os.path.relpath(f, self.repo_path) for f in gitignore_files]
         rel_paths.sort()
 
-        assert len(rel_paths) == 3
+        assert len(rel_paths) == 4
         assert ".gitignore" in rel_paths
         assert os.path.join("src", ".gitignore") in rel_paths
+        assert os.path.join("src", "lib", ".gitignore") in rel_paths  # Deeply nested
         assert os.path.join("docs", ".gitignore") in rel_paths
 
     def test_parse_patterns_root_directory(self):
@@ -191,6 +206,16 @@ test.log
 
         # But temp/ outside docs should not be ignored by docs/.gitignore
         assert not parser.should_ignore("temp/file.txt")
+
+        # Test deeply nested .gitignore in src/lib/
+        # .tmp files in src/lib should be ignored
+        assert parser.should_ignore("src/lib/cache.tmp")
+
+        # .cache files in src/lib should also be ignored
+        assert parser.should_ignore("src/lib/data.cache")
+
+        # But .tmp files outside src/lib should not be ignored by src/lib/.gitignore
+        assert not parser.should_ignore("src/other.tmp")
 
     def test_anchored_vs_non_anchored_patterns(self):
         """Test the difference between anchored and non-anchored patterns."""
