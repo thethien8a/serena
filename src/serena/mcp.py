@@ -71,7 +71,7 @@ class SerenaMCPFactory:
         """
         s = deepcopy(schema)
 
-        def walk(node):
+        def walk(node):  # type: ignore
             if not isinstance(node, dict):
                 # lists get handled by parent calls
                 return node

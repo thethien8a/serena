@@ -102,46 +102,47 @@ implementation.
 
 <!-- toc -->
 
-* [Quick Start](#quick-start)
+- [Quick Start](#quick-start)
   * [Running the Serena MCP Server](#running-the-serena-mcp-server)
-    * [Usage](#usage)
-      * [Using uvx](#using-uvx)
+    + [Usage](#usage)
+      - [Using uvx](#using-uvx)
         * [Local Installation](#local-installation)
-      * [Using Docker (Experimental)](#using-docker-experimental)
-    * [SSE Mode](#sse-mode)
-    * [Command-Line Arguments](#command-line-arguments)
+      - [Using Docker (Experimental)](#using-docker-experimental)
+    + [SSE Mode](#sse-mode)
+    + [Command-Line Arguments](#command-line-arguments)
   * [Configuration](#configuration)
   * [Project Activation & Indexing](#project-activation--indexing)
   * [Claude Code](#claude-code)
+  * [Codex](#codex)
   * [Other Terminal-Based Clients](#other-terminal-based-clients)
   * [Claude Desktop](#claude-desktop)
   * [MCP Coding Clients (Cline, Roo-Code, Cursor, Windsurf, etc.)](#mcp-coding-clients-cline-roo-code-cursor-windsurf-etc)
   * [Local GUIs and Frameworks](#local-guis-and-frameworks)
-* [Detailed Usage and Recommendations](#detailed-usage-and-recommendations)
+- [Detailed Usage and Recommendations](#detailed-usage-and-recommendations)
   * [Tool Execution](#tool-execution)
-    * [Shell Execution and Editing Tools](#shell-execution-and-editing-tools)
+    + [Shell Execution and Editing Tools](#shell-execution-and-editing-tools)
   * [Modes and Contexts](#modes-and-contexts)
-    * [Contexts](#contexts)
-    * [Modes](#modes)
-    * [Customization](#customization)
+    + [Contexts](#contexts)
+    + [Modes](#modes)
+    + [Customization](#customization)
   * [Onboarding and Memories](#onboarding-and-memories)
   * [Prepare Your Project](#prepare-your-project)
-    * [Structure Your Codebase](#structure-your-codebase)
-    * [Start from a Clean State](#start-from-a-clean-state)
-    * [Logging, Linting, and Automated Tests](#logging-linting-and-automated-tests)
+    + [Structure Your Codebase](#structure-your-codebase)
+    + [Start from a Clean State](#start-from-a-clean-state)
+    + [Logging, Linting, and Automated Tests](#logging-linting-and-automated-tests)
   * [Prompting Strategies](#prompting-strategies)
   * [Potential Issues in Code Editing](#potential-issues-in-code-editing)
   * [Running Out of Context](#running-out-of-context)
   * [Combining Serena with Other MCP Servers](#combining-serena-with-other-mcp-servers)
   * [Serena's Logs: The Dashboard and GUI Tool](#serenas-logs-the-dashboard-and-gui-tool)
   * [Troubleshooting](#troubleshooting)
-* [Comparison with Other Coding Agents](#comparison-with-other-coding-agents)
+- [Comparison with Other Coding Agents](#comparison-with-other-coding-agents)
   * [Subscription-Based Coding Agents](#subscription-based-coding-agents)
   * [API-Based Coding Agents](#api-based-coding-agents)
   * [Other MCP-Based Coding Agents](#other-mcp-based-coding-agents)
-* [Acknowledgements](#acknowledgements)
-* [Customizing and Extending Serena](#customizing-and-extending-serena)
-* [List of Tools](#list-of-tools)
+- [Acknowledgements](#acknowledgements)
+- [Customizing and Extending Serena](#customizing-and-extending-serena)
+- [List of Tools](#list-of-tools)
 
 <!-- tocstop -->
 
@@ -347,6 +348,33 @@ claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena 
   If you want to make use of that, you will have to enable the corresponding tool explicitly by adding `initial_instructions` to the `included_optional_tools`
   in your config.
   Note that you may have to make Claude read the instructions when you start a new conversation and after any compacting operation to ensure Claude remains properly configured to use Serena's tools.
+
+### Codex
+
+Serena works with OpenAI's Codex CLI out of the box, but you have to use the `codex` context for it to work properly. (The technical reason is that Codex doesn't fully support the MCP specifications, so some massaging of tools is required.).
+
+Unlike Claude Code, in Codex you add an MCP server globally and not per project. Add the following to
+`~/.codex/config.toml` (create the file if it does not exist):
+
+```toml
+[mcp_servers.serena]
+command = "uvx"
+args = ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server", "--context", "codex"]
+```
+
+After codex has started, you need to activate the project, which you can do by saying:
+
+"Activate the current dir as project using serena"
+
+> If you don't activate the project, you will not be able to use Serena's tools!
+
+That's it! Have a look at `~/.codex/log/codex-tui.log` to see if any errors occurred.
+
+The Serena dashboard will run if you have not disabled it in the configuration, but due to Codex's sandboxing the webbrowser 
+may not open automatically. You can open it manually by going to `http://localhost:24282/dashboard/index.html` (or a higher port, if
+that was already taken).
+
+> Codex will often show the tools as `failed` even though they are successfully executed. This is not a problem, seems to be a bug in Codex. Despite the error message, everything works as expected.
 
 ### Other Terminal-Based Clients
 

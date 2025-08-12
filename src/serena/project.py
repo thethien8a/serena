@@ -89,7 +89,8 @@ class Project:
 
     def _is_ignored_relative_path(self, relative_path: str | Path, ignore_non_source_files: bool = True) -> bool:
         """
-        Determine whether a path should be ignored based on file type and ignore patterns.
+        Determine whether an existing path should be ignored based on file type and ignore patterns.
+        Raises `FileNotFoundError` if the path does not exist.
 
         :param relative_path: Relative path to check
         :param ignore_non_source_files: whether files that are not source files (according to the file masks
@@ -156,10 +157,22 @@ class Project:
         path = path.resolve()
         return path.is_relative_to(_proj_root)
 
+    def relative_path_exists(self, relative_path: str) -> bool:
+        """
+        Checks if the given relative path exists in the project directory.
+
+        :param relative_path: the path to check, relative to the project root
+        :return: True if the path exists, False otherwise
+        """
+        abs_path = Path(self.project_root) / relative_path
+        return abs_path.exists()
+
     def validate_relative_path(self, relative_path: str) -> None:
         """
-        Validates that the given relative path is safe to read or edit,
+        Validates that the given relative path to an existing file/dir is safe to read or edit,
         meaning it's inside the project directory and is not ignored by git.
+
+        Passing a path to a non-existing file will lead to a `FileNotFoundError`.
         """
         if not self.is_path_in_project(relative_path):
             raise ValueError(f"{relative_path=} points to path outside of the repository root; cannot access for safety reasons")

@@ -7,11 +7,17 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # Install system dependencies required for package manager and build tools.
+# sudo, wget, zip needed for some assistants, like junie
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     build-essential \
     git \
     ssh \
+    sudo \
+    wget \
+    zip \
+    unzip \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pipx.

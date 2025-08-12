@@ -94,17 +94,23 @@ class CreateTextFileTool(Tool, ToolMarkerCanEdit):
         :param content: the (utf-8-encoded) content to write to the file
         :return: a message indicating success or failure
         """
-        self.project.validate_relative_path(relative_path)
-
-        abs_path = (Path(self.get_project_root()) / relative_path).resolve()
+        project_root = self.get_project_root()
+        abs_path = (Path(project_root) / relative_path).resolve()
         will_overwrite_existing = abs_path.exists()
+
+        if will_overwrite_existing:
+            self.project.validate_relative_path(relative_path)
+        else:
+            assert abs_path.is_relative_to(
+                self.get_project_root()
+            ), f"Cannot create file outside of the project directory, got {relative_path=}"
 
         abs_path.parent.mkdir(parents=True, exist_ok=True)
         abs_path.write_text(content, encoding="utf-8")
         answer = f"File created: {relative_path}."
         if will_overwrite_existing:
             answer += " Overwrote existing file."
-        return answer
+        return json.dumps(answer)
 
 
 class ListDirTool(Tool):
