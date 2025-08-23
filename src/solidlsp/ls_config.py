@@ -44,6 +44,9 @@ class Language(str, Enum):
     TERRAFORM = "terraform"
     SWIFT = "swift"
     BASH = "bash"
+    ZIG = "zig"
+    LUA = "lua"
+    NIX = "nix"
     # Experimental or deprecated Language Servers
     TYPESCRIPT_VTS = "typescript_vts"
     """Use the typescript language server through the natively bundled vscode extension via https://github.com/yioneko/vtsls"""
@@ -109,6 +112,12 @@ class Language(str, Enum):
                 return FilenameMatcher("*.swift")
             case self.BASH:
                 return FilenameMatcher("*.sh", "*.bash")
+            case self.ZIG:
+                return FilenameMatcher("*.zig", "*.zon")
+            case self.LUA:
+                return FilenameMatcher("*.lua")
+            case self.NIX:
+                return FilenameMatcher("*.nix")
             case _:
                 raise ValueError(f"Unhandled language: {self}")
 

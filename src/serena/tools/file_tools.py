@@ -216,6 +216,7 @@ class ReplaceRegexTool(Tool, ToolMarkerCanEdit):
             Dot matches all characters, multi-line matching is enabled.
         :param repl: the string to replace the matched content with, which may contain
             backreferences like \1, \2, etc.
+            Make sure to escape special characters appropriately, e.g., use `\\n` for a literal `\n`.
         :param allow_multiple_occurrences: if True, the regex may match multiple occurrences in the file
             and all of them will be replaced.
             If this is set to False and the regex matches multiple occurrences, an error will be returned
