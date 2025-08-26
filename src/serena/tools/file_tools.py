@@ -24,13 +24,7 @@ class ReadFileTool(Tool):
     Reads a file within the project directory.
     """
 
-<<<<<<< HEAD
-    def apply(
-        self, relative_path: str, start_line: Union[int, str] = 0, end_line: Union[int, str, None] = None, max_answer_chars: Union[int, str] = TOOL_DEFAULT_MAX_ANSWER_LENGTH
-    ) -> str:
-=======
-    def apply(self, relative_path: str, start_line: int = 0, end_line: int | None = None, max_answer_chars: int = -1) -> str:
->>>>>>> 0699c378c1515c28bec1198da05c3ff35057348d
+    def apply(self, relative_path: str, start_line: Union[int, str] = 0, end_line: Union[int, str, None] = None, max_answer_chars: Union[int, str] = -1) -> str:
         """
         Reads the given file or a chunk of it. Generally, symbolic operations
         like find_symbol or find_referencing_symbols should be preferred if you know which symbols you are looking for.
@@ -122,11 +116,7 @@ class ListDirTool(Tool):
     Lists files and directories in the given directory (optionally with recursion).
     """
 
-<<<<<<< HEAD
-    def apply(self, relative_path: str, recursive: bool, max_answer_chars: Union[int, str] = TOOL_DEFAULT_MAX_ANSWER_LENGTH) -> str:
-=======
-    def apply(self, relative_path: str, recursive: bool, max_answer_chars: int = -1) -> str:
->>>>>>> 0699c378c1515c28bec1198da05c3ff35057348d
+    def apply(self, relative_path: str, recursive: bool, max_answer_chars: Union[int, str] = -1) -> str:
         """
         Lists all non-gitignored files and directories in the given directory (optionally with recursion).
 
@@ -346,11 +336,7 @@ class SearchForPatternTool(Tool):
         paths_exclude_glob: str | None = None,
         relative_path: str = "",
         restrict_search_to_code_files: bool = False,
-<<<<<<< HEAD
-        max_answer_chars: Union[int, str] = TOOL_DEFAULT_MAX_ANSWER_LENGTH,
-=======
-        max_answer_chars: int = -1,
->>>>>>> 0699c378c1515c28bec1198da05c3ff35057348d
+        max_answer_chars: Union[int, str] = -1,
     ) -> str:
         """
         Offers a flexible search for arbitrary patterns in the codebase, including the
