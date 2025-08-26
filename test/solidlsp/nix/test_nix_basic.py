@@ -106,14 +106,14 @@ class TestNixLanguageServer:
 
         assert refs is not None
         assert isinstance(refs, list)
-        # nixd finds at least the inherit statement (line 66)
+        # nixd finds at least the inherit statement (line 67)
         assert len(refs) >= 1, f"Should find at least 1 reference to makeGreeting, found {len(refs)}"
 
         # Verify makeGreeting is referenced at expected locations
         if refs:
             ref_lines = sorted([ref["range"]["start"]["line"] for ref in refs])
-            # Check if we found the inherit (line 66, 0-indexed: 65)
-            assert 65 in ref_lines, f"Should find makeGreeting inherit at line 66, found at lines {[l+1 for l in ref_lines]}"
+            # Check if we found the inherit (line 67, 0-indexed: 66)
+            assert 66 in ref_lines, f"Should find makeGreeting inherit at line 67, found at lines {[l+1 for l in ref_lines]}"
 
     @pytest.mark.parametrize("language_server", [Language.NIX], indirect=True)
     def test_hover_information(self, language_server: SolidLanguageServer) -> None:

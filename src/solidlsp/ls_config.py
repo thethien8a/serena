@@ -47,6 +47,7 @@ class Language(str, Enum):
     ZIG = "zig"
     LUA = "lua"
     NIX = "nix"
+    ERLANG = "erlang"
     # Experimental or deprecated Language Servers
     TYPESCRIPT_VTS = "typescript_vts"
     """Use the typescript language server through the natively bundled vscode extension via https://github.com/yioneko/vtsls"""
@@ -55,6 +56,10 @@ class Language(str, Enum):
     CSHARP_OMNISHARP = "csharp_omnisharp"
     """OmniSharp language server for C# (instead of the default csharp-ls by microsoft).
     Currently has problems with finding references, and generally seems less stable and performant.
+    """
+    RUBY_SOLARGRAPH = "ruby_solargraph"
+    """Solargraph language server for Ruby (legacy, experimental).
+    Use Language.RUBY (ruby-lsp) for better performance and modern LSP features.
     """
 
     @classmethod
@@ -67,7 +72,7 @@ class Language(str, Enum):
         """
         Check if the language server is experimental or deprecated.
         """
-        return self in {self.TYPESCRIPT_VTS, self.PYTHON_JEDI, self.CSHARP_OMNISHARP}
+        return self in {self.TYPESCRIPT_VTS, self.PYTHON_JEDI, self.CSHARP_OMNISHARP, self.RUBY_SOLARGRAPH}
 
     def __str__(self) -> str:
         return self.value
@@ -93,6 +98,8 @@ class Language(str, Enum):
             case self.GO:
                 return FilenameMatcher("*.go")
             case self.RUBY:
+                return FilenameMatcher("*.rb", "*.erb")
+            case self.RUBY_SOLARGRAPH:
                 return FilenameMatcher("*.rb")
             case self.CPP:
                 return FilenameMatcher("*.cpp", "*.h", "*.hpp", "*.c", "*.hxx", "*.cc", "*.cxx")
@@ -118,6 +125,8 @@ class Language(str, Enum):
                 return FilenameMatcher("*.lua")
             case self.NIX:
                 return FilenameMatcher("*.nix")
+            case self.ERLANG:
+                return FilenameMatcher("*.erl", "*.hrl", "*.escript", "*.config", "*.app", "*.app.src")
             case _:
                 raise ValueError(f"Unhandled language: {self}")
 
